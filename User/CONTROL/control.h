@@ -169,4 +169,6 @@ void Get_Angle(u8 way);
 void Remote_Control(void);
 void RC_Lidar_avoid(float *Vx,float *Vz);
 
+extern float Odometry_X, Odometry_Y, Odometry_Theta;
+
 #endif

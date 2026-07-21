@@ -5,7 +5,7 @@
 <h2>Tool Versions:</h2>
 IDE-Version: μVision V5.43.1.0
 Copyright (C) 2025 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: 1 meihaoshidai, 1, LIC=----
+License Information: 1 meihaoshidai, 1, LIC=PE7DL-0SCM8-01HP1-CALU1-UWXZN-9T2AW
  
 Tool Versions:
 Toolchain:       MDK-ARM Plus  Version: 5.43.0.0
@@ -68,14 +68,17 @@ compiling DataScope_DP.C...
 compiling bsp_oled.c...
 compiling pstwo.c...
 compiling usartx.c...
+..\..\User\HARDWARE\usartx\usartx.c(36): warning:  #177-D: variable "Vtheta"  was declared but never referenced
+  	float Vx, Vtheta, dt = 0.005f; // 5ms interval
+..\..\User\HARDWARE\usartx\usartx.c: 1 warning, 0 errors
 compiling control.c...
-..\..\User\CONTROL\control.c(249): warning:  #177-D: variable "MotorA_Velocity"  was declared but never referenced
+..\..\User\CONTROL\control.c(251): warning:  #177-D: variable "MotorA_Velocity"  was declared but never referenced
   	float MotorA_Velocity,MotorB_Velocity;
-..\..\User\CONTROL\control.c(249): warning:  #177-D: variable "MotorB_Velocity"  was declared but never referenced
+..\..\User\CONTROL\control.c(251): warning:  #177-D: variable "MotorB_Velocity"  was declared but never referenced
   	float MotorA_Velocity,MotorB_Velocity;
-..\..\User\CONTROL\control.c(814): warning:  #177-D: variable "RX"  was declared but never referenced
+..\..\User\CONTROL\control.c(820): warning:  #177-D: variable "RX"  was declared but never referenced
       int LX,RY,RX,Remote_RCvelocity=350; 
-..\..\User\CONTROL\control.c(814): warning:  #177-D: variable "Remote_RCvelocity"  was declared but never referenced
+..\..\User\CONTROL\control.c(820): warning:  #177-D: variable "Remote_RCvelocity"  was declared but never referenced
       int LX,RY,RX,Remote_RCvelocity=350; 
 ..\..\User\CONTROL\control.c: 4 warnings, 0 errors
 compiling show.c...
@@ -91,6 +94,12 @@ compiling capture.c...
 compiling ELE_CCD.c...
 compiling inv_mpu.c...
 compiling inv_mpu_dmp_motion_driver.c...
+compiling filter.c...
+..\..\User\MPU6050\filter\filter.c(32): warning:  #550-D: variable "angle_dot"  was set but never used
+  	static float angle_dot;
+..\..\User\MPU6050\filter\filter.c(102): warning:  #550-D: variable "angle_dot"  was set but never used
+  	static float angle_dot;
+..\..\User\MPU6050\filter\filter.c: 2 warnings, 0 errors
 compiling IOI2C.c...
 ..\..\User\MPU6050\IIC\IOI2C.c(93): warning:  #61-D: integer operation result is out of range
   	SDA_IN();      //SDA设置为输入  
@@ -101,18 +110,12 @@ compiling IOI2C.c...
 ..\..\User\MPU6050\IIC\IOI2C.c(250): warning:  #68-D: integer conversion resulted in a change of sign
   	SDA_IN();//SDA设置为输入
 ..\..\User\MPU6050\IIC\IOI2C.c: 4 warnings, 0 errors
-compiling filter.c...
-..\..\User\MPU6050\filter\filter.c(32): warning:  #550-D: variable "angle_dot"  was set but never used
-  	static float angle_dot;
-..\..\User\MPU6050\filter\filter.c(102): warning:  #550-D: variable "angle_dot"  was set but never used
-  	static float angle_dot;
-..\..\User\MPU6050\filter\filter.c: 2 warnings, 0 errors
 compiling MPU6050.c...
 linking...
-Program Size: Code=62160 RO-data=15128 RW-data=956 ZI-data=7932  
+Program Size: Code=63728 RO-data=15216 RW-data=968 ZI-data=7960  
 FromELF: creating hex file...
 After Build - User command #1: fromelf --bin --output=..\..\WHEELTEC.bin ..\..\Output\MiniBalance.axf
-"..\..\Output\MiniBalance.axf" - 0 Error(s), 12 Warning(s).
+"..\..\Output\MiniBalance.axf" - 0 Error(s), 13 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -125,7 +128,7 @@ Package Vendor: Keil
   C:/Users/meihaoshidai/AppData/Local/Arm/Packs/Keil/STM32F1xx_DFP/2.4.1/Device/Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:19
+Build Time Elapsed:  00:00:23
 </pre>
 </body>
 </html>

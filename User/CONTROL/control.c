@@ -31,6 +31,7 @@ u8 Lidar_Detect = Lidar_Detect_ON;			//电磁巡线模式雷达检测障碍物，默认开启
 float CCD_Move_X = 0.3;						//CCD巡线速度
 float ELE_Move_X = 0.6;						//电磁巡线速度
 u8 Ros_count=0,Lidar_flag_count=0;
+float Odometry_X = 0, Odometry_Y = 0, Odometry_Theta = 0;
 Encoder OriginalEncoder; //Encoder raw data //编码器原始数据   
 short Accel_Y,Accel_Z,Accel_X,Accel_Angle_x,Accel_Angle_y,Gyro_X,Gyro_Z,Gyro_Y;
 /**************************************************************************
@@ -48,6 +49,7 @@ int TIMING_TIM_IRQHandler(void)
 	{			
 		TIM_ClearITPendingBit(TIMING_TIM , TIM_IT_Update);
 		Get_Velocity_From_Encoder();								//读取左右编码器的值且转换成速度
+		ROS_Odometry_Update();									// 里程计积积 (5ms)
         Get_KeyVal();		 		
 		if(delay_flag)												//50ms延时
 		{
@@ -791,6 +793,10 @@ void Get_Angle(u8 way)
 			Roll = -Complementary_Filter_x(Accel_Angle_x,Gyro_X);//互补滤波
 			Pitch= -Complementary_Filter_y(Accel_Angle_y,Gyro_Y);
 		}
+		// Yaw integration from gyro Z (50ms interval when called)
+		Yaw += ((float)Gyro_Z / 65.5f) * 0.05f;
+		if(Yaw > 180.0f) Yaw -= 360.0f;
+		if(Yaw < -180.0f) Yaw += 360.0f;
 	}
 }
 

@@ -17,10 +17,40 @@ Update：2023-03-02
 All rights reserved
 ***********************************************/
 #include "usartx.h"
+#include <math.h>
+
+// Extern for IMU and odometry data
+extern float Roll, Pitch, Yaw;
+extern float Odometry_X, Odometry_Y, Odometry_Theta;
 SEND_DATA Send_Data;
 RECEIVE_DATA Receive_Data;
 int Time_count;
 
+/**************************************************************************
+Function: Accumulate odometry from encoders (call every 5ms)
+Input   : none
+Output  : none
+**************************************************************************/	 	
+void ROS_Odometry_Update(void)
+{
+	float Vx, Vtheta, dt = 0.005f; // 5ms interval
+	float heading_rad;
+	
+	// Forward velocity from encoder average (m/s)
+	Vx = (MotorA.Current_Encoder + MotorB.Current_Encoder) / 2.0f;
+	
+	// Skip if moving very slowly (noise threshold)
+	if(Vx > -0.01f && Vx < 0.01f && MotorA.Current_Encoder == 0 && MotorB.Current_Encoder == 0)
+		return;
+	
+	// Use IMU Yaw for heading (converted to radians)
+	heading_rad = Yaw * 3.14159265f / 180.0f;
+	
+	// Integrate position (convert m/s * s to mm)
+	Odometry_X += Vx * cos(heading_rad) * dt * 1000.0f;
+	Odometry_Y += Vx * sin(heading_rad) * dt * 1000.0f;
+	Odometry_Theta = Yaw; // Use IMU Yaw directly (degrees)
+}
 
 /**************************************************************************
 Function: The data sent by the serial port is assigned
@@ -120,12 +150,38 @@ void data_transition(void)
 	//电池电压,拆分为两个8位数据发送
 	Send_Data.buffer[20]=Send_Data.Sensor_Str.Power_Voltage >>8; 
 	Send_Data.buffer[21]=Send_Data.Sensor_Str.Power_Voltage; 
+	
+	//Assign Roll, Pitch, Yaw (*100 for short packing)
+	Send_Data.Sensor_Str.Roll = (short)(Roll * 100);
+	Send_Data.Sensor_Str.Pitch = (short)(Pitch * 100);
+	Send_Data.Sensor_Str.Yaw = (short)(Yaw * 100);
+	
+	//Assign Odometry (mm, deg*100)
+	Send_Data.Sensor_Str.Odometry_X = (short)(Odometry_X);
+	Send_Data.Sensor_Str.Odometry_Y = (short)(Odometry_Y);
+	Send_Data.Sensor_Str.Odometry_Theta = (short)(Odometry_Theta * 100);
+	
+	//Roll, Pitch, Yaw angle *100 (deg)
+	Send_Data.buffer[22]=Send_Data.Sensor_Str.Roll>>8;
+	Send_Data.buffer[23]=Send_Data.Sensor_Str.Roll;
+	Send_Data.buffer[24]=Send_Data.Sensor_Str.Pitch>>8;
+	Send_Data.buffer[25]=Send_Data.Sensor_Str.Pitch;
+	Send_Data.buffer[26]=Send_Data.Sensor_Str.Yaw>>8;
+	Send_Data.buffer[27]=Send_Data.Sensor_Str.Yaw;
+
+	//Odometry X Y (mm) and heading *100 (deg)
+	Send_Data.buffer[28]=Send_Data.Sensor_Str.Odometry_X>>8;
+	Send_Data.buffer[29]=Send_Data.Sensor_Str.Odometry_X;
+	Send_Data.buffer[30]=Send_Data.Sensor_Str.Odometry_Y>>8;
+	Send_Data.buffer[31]=Send_Data.Sensor_Str.Odometry_Y;
+	Send_Data.buffer[32]=Send_Data.Sensor_Str.Odometry_Theta>>8;
+	Send_Data.buffer[33]=Send_Data.Sensor_Str.Odometry_Theta;
 
   //Data check digit calculation, Pattern 1 is a data check
   //数据校验位计算，模式1是发送数据校验
-	Send_Data.buffer[22]=Check_Sum(22,1); 
+	Send_Data.buffer[34]=Check_Sum(34,1); 
 	
-	Send_Data.buffer[23]=Send_Data.Sensor_Str.Frame_Tail; //Frame_tail //帧尾
+	Send_Data.buffer[35]=Send_Data.Sensor_Str.Frame_Tail; //Frame_tail //帧尾
 }
 
 
@@ -140,7 +196,7 @@ Output  : none
 void USART1_SEND(void)
 {
      u8 i = 0;	
-	for(i=0; i<24; i++)
+	for(i=0; i<36; i++)
 	{
 		usart1_send(Send_Data.buffer[i]);
 	}	 

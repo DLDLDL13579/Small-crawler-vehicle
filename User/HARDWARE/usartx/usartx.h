@@ -24,7 +24,7 @@ All rights reserved
 
 #define FRAME_HEADER      0X7B //Frame_header //帧头
 #define FRAME_TAIL        0X7D //Frame_tail   //帧尾
-#define SEND_DATA_SIZE    24
+#define SEND_DATA_SIZE    36
 #define RECEIVE_DATA_SIZE 11
 
 //串口2-USART2
@@ -40,12 +40,12 @@ All rights reserved
 #define  ROS_USART_GPIO_APBxClkCmd    RCC_APB2PeriphClockCmd
 
 #define  ROS_USART_TX_GPIO_PORT       GPIOA   
-#define  ROS_USART_TX_GPIO_PIN        GPIO_Pin_2
+#define  ROS_USART_TX_GPIO_PIN        GPIO_Pin_9
 #define  ROS_USART_RX_GPIO_PORT       GPIOA
-#define  ROS_USART_RX_GPIO_PIN        GPIO_Pin_3
+#define  ROS_USART_RX_GPIO_PIN        GPIO_Pin_10
 
-#define  ROS_USART_IRQ                USART2_IRQn
-#define  ROS_USART_IRQHandler         USART2_IRQHandler
+#define  ROS_USART_IRQ                USART1_IRQn
+#define  ROS_USART_IRQHandler         USART1_IRQHandler
 
 //阿克曼车型的最小转弯半径，由机械结构决定：轮距、轴距、前轮最大转角
 #define MINI_AKM_MIN_TURN_RADIUS 0.350f 
@@ -72,7 +72,13 @@ typedef struct _SEND_DATA_
 		short Z_speed;              //2 bytes //2个字节
 		short Power_Voltage;        //2 bytes //2个字节
 		Mpu6050_Data Accelerometer; //6 bytes //6个字节
-		Mpu6050_Data Gyroscope;     //6 bytes //6个字节	
+		Mpu6050_Data Gyroscope;     //6 bytes //6个字节
+		short Roll;                  //2 bytes - roll angle *100 (deg)
+		short Pitch;                 //2 bytes - pitch angle *100 (deg)
+		short Yaw;                   //2 bytes - yaw angle *100 (deg)
+		short Odometry_X;            //2 bytes - acc X position (mm)
+		short Odometry_Y;            //2 bytes - acc Y position (mm)
+		short Odometry_Theta;        //2 bytes - acc heading *100 (deg)
 		unsigned char Frame_Tail;   //1 bytes //1个字节
 	}Sensor_Str;
 }SEND_DATA;
@@ -101,6 +107,7 @@ float Vz_to_Akm_Angle(float Vx, float Vz);
 float XYZ_Target_Speed_transition(u8 High,u8 Low);
 
 void usart1_send(u8 data);
+void ROS_Odometry_Update(void);
 
 
 u8 Check_Sum(unsigned char Count_Number,unsigned char Mode);
